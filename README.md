@@ -1,6 +1,6 @@
 # GoalOps 🎯
 
-> **Enterprise Goal Setting & Tracking Portal** — Built for the Atomberg Hackathon 2026
+> **Enterprise Goal Setting & Tracking Portal** — Built for the ATOMQUEST HACKATHON 1.0
 
 GoalOps replaces scattered spreadsheets and appraisal chaos with a secure, audit-ready goal operating system for employees, managers, and HR.
 
@@ -8,208 +8,87 @@ GoalOps replaces scattered spreadsheets and appraisal chaos with a secure, audit
 
 ---
 
-## 🎯 Hackathon Evaluator Guide (Quick Links)
+## 🎯 Hackathon Evaluator Guide & Deliverables
 
 **Welcome Judges!** To ensure a flawless evaluation experience, we have deployed the portal in an **"Ultra-Reliable Demo Mode"**. All data (users, goals, charts, logs) is securely pre-seeded in memory. **You do NOT need to configure a database or API keys to test this application.**
 
 ### ✅ Submission Deliverables Fulfilled
-1. **Live / Hosted Demo URL:** [Insert Your Vercel Link Here]
-2. **Source Code Repository:** [Insert Your GitHub Link Here]
-3. **Architecture Diagram:** See the `architecture.md` file in the root directory for a complete Mermaid architecture flow.
-4. **Login Credentials:** Bypassed for your convenience. Use the **"Demo Role Switcher"** in the top right corner to instantly switch between Employee, Manager, and HR roles.
-
-### 🏆 How We Hit The 6 Evaluation Parameters
-1. **Functionality:** 100% end-to-end flow tested. Employees submit, Managers approve, Employees update progress, HR audits.
-2. **Adherence to BRD:** Strict UI validation enforces the 100% weightage, max 8 goals, and min 10% rules. Complex scoring engine calculates exactly as requested (Min, Max, Zero-based).
-3. **User Friendliness:** Premium dark-mode UI, glassmorphism, slide-in panels, and zero loading spinners thanks to local state.
-4. **Presence of Bugs:** 0 network timeouts or database errors during the pitch due to the demo-first architecture. 
-5. **Good-to-Have Features (Bonus):** We crushed **Section 5.4 (Analytics)** with a full HR Dashboard & Heatmap, and built an in-app **Notifications Panel** (Section 5.2). 
-6. **Cost Optimisation:** Zero-idle-cost architecture using Next.js Serverless + Gemini 1.5 Flash.
+1. **Live Demo URL:** [👉 View Live Application Here 👈](#replace-with-vercel-link)
+2. **Working Video:** [👉 Watch the Video Demo Here 👈](#replace-with-youtube-link)
+3. **Source Code:** [GitHub Repository](#replace-with-github-link)
+4. **Architecture Diagram:** See the architecture diagram below.
+5. **Login Credentials:** Bypassed for convenience. Use the **"Demo Role Switcher"** in the top right corner to instantly switch between Employee, Manager, and HR roles.
 
 ---
 
-## 🌟 Key Features
+## 🏗 Architecture & Tech Stack
 
-| Feature | Description |
-|---|---|
-| **Role-Based Portal** | Employee, Manager L1, Admin/HR — each with dedicated screens |
-| **Goal Builder** | SMART goal creation with thrust areas, UoM, score direction |
-| **Live Validation** | Real-time weightage checker (min 10%, total 100%, max 8 goals) |
-| **Approval Workflow** | Manager inline editing, approve/return, automatic goal locking |
-| **Quarterly Check-ins** | Achievement actuals with computed weighted scores |
-| **AI Goal Coach** | Gemini-powered SMART goal transformation + risk flagging |
-| **AI Check-in Assistant** | Generates coaching summary and questions from goal progress |
-| **Audit Log** | Append-only event trail with JSON diff viewer |
-| **HR Dashboard** | Recharts-powered completion heatmap, trend lines, pie charts |
-| **Export Center** | CSV download for goals, achievements, audit logs |
-| **Demo Role Switcher** | Switch between Alice/Bob/Carol instantly for judges |
+![GoalOps Architecture Diagram](./architecture.png)
+*(Note: If the image above does not load, please view the Mermaid architecture flow in the source code).*
+
+**Tech Stack (Evaluation Parameter 6 - Cost Optimisation):**
+We architected this for maximum efficiency and zero-idle costs.
+- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS, Framer Motion
+- **AI Integration**: Google Gemini 1.5 Flash (Cheaper & faster for structured JSON extraction)
+- **Database Schema**: Supabase PostgreSQL (14-table schema included in `/supabase`)
+- **Hosting**: Vercel Serverless Functions
 
 ---
 
-## 🎭 Demo Credentials
+## 🏆 How We Solved The Problem Statement
 
-| Role | Name | Notes |
-|---|---|---|
-| 👤 Employee | Alice Sharma | Create goals, update Q1 progress |
-| 👔 Manager | Bob Mehta | Approve Alice's goals, run check-ins |
-| 🛡 Admin/HR | Carol D'souza | Dashboard, audit log, export |
+### 1. Phase 1 — Goal Creation & Approval (Must-Have)
+- **Goal Builder:** Employees can draft goals, select Thrust Areas, and assign UoM (Numeric, %, Binary).
+- **Strict Validation Rules:** The UI math engine strictly enforces:
+  - Total weightage must equal exactly **100%**.
+  - Minimum weightage per goal is **10%**.
+  - Maximum **8 goals** per employee.
+- **Approval Workflow:** Managers have a dedicated Approval Queue to review goals, edit weightages inline, and click **Approve & Lock** (which freezes edits without Admin intervention).
 
-Use the **Demo Role Switcher** in the top-right corner to switch instantly.
+### 2. Phase 2 — Achievement Tracking & Check-ins (Must-Have)
+- **Quarterly Updates:** Employees log their Actual Achievement in the Update Progress screen.
+- **System-Computed Scores:** Our mathematical engine normalizes scores across UoMs (automatically handling formulas for "Higher is Better", "Lower is Better", and "Zero-based").
+- **Manager Check-ins:** Managers view Planned vs Actuals.
+- **✨ OUR SECRET WEAPON (AI Assistant):** Instead of managers writing generic feedback, our integrated **Gemini AI** reads the employee's progress and auto-drafts structured coaching comments and questions!
 
----
+### 3. Reporting & Governance Requirements
+- **Exportable Reports:** HR can download CSVs of achievements via the Export Center.
+- **Audit Trail:** Our dedicated Audit Log tracks every post-lock edit, capturing *who changed what and when*, complete with an interactive **JSON Diff Viewer**.
 
-## 🏗 Tech Stack
-
-- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
-- **UI Components**: Radix UI primitives, Framer Motion animations
-- **Charts**: Recharts (bar, line, pie)
-- **Database**: Supabase Postgres + Row Level Security
-- **AI**: Google Gemini 1.5 Flash (structured JSON output)
-- **Deploy**: Vercel
-
----
-
-## 🚀 Quick Start
-
-### 1. Clone and install
-```bash
-git clone https://github.com/your-org/goalops
-cd goalops
-npm install
-```
-
-### 2. Set up environment variables
-```bash
-cp .env.local.example .env.local
-```
-
-Edit `.env.local`:
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-GEMINI_API_KEY=your_gemini_api_key
-```
-
-### 3. Set up the database
-1. Go to your Supabase project → SQL Editor
-2. Run `supabase/schema.sql`
-3. Run `supabase/seed.sql`
-
-### 4. Run locally
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000)
+### 4. Good-to-Have Features (Section 5 Bonus Points)
+We strategically focused on high-impact visual bonus features:
+- **✅ 5.4 Analytics Module:** We built a comprehensive HR Dashboard featuring:
+  - Recharts-powered pie charts for Goal Distribution by Status.
+  - Animated Heatmaps for departmental completion rates.
+  - Quarter-on-Quarter trend line charts.
+- **✅ 5.2 Notifications (Simulated):** We built a beautiful slide-out Notifications Panel that alerts users to key events (e.g., Goals Approved, Check-ins Overdue).
 
 ---
 
-## 🗄 Database Schema
-
-14 tables covering the full goal lifecycle:
-
-```
-users → departments → cycles → periods → thrust_areas
-goal_sheets → goals → shared_goal_groups
-achievements → checkins → approvals
-audit_logs → notifications → escalations
-```
-
----
-
-## 🤖 AI Features
-
-### Goal Coach (Gemini)
-Click the ✨ sparkle icon on any goal to get:
-- SMART-formatted improved title and description
-- Suggested unit of measure and target
-- Score direction recommendation
-- Risk flags on weak/vague goals
-- Coaching questions for the employee
-
-**Works without API key** — falls back to a realistic mock response for demo reliability.
-
-### Check-in Assistant (Gemini)
-In the manager check-in view, click "AI Draft" to:
-- Summarize quarterly progress across all goals
-- Generate 3 neutral coaching questions
-- Assess overall progress trend
-
----
-
-## 📊 Business Rules
-
-| Rule | Implementation |
-|---|---|
-| Max 8 goals per sheet | Validated on add |
-| Min 10% weightage per goal | Validated on input |
-| Total weightage = 100% | Validated before submit |
-| Goals lock after approval | Status → `locked`, edit blocked |
-| Post-lock edits → audit trail | Every change recorded |
-| Score: higher-better | `actual / target × 100` |
-| Score: lower-better | `target / actual × 100` |
-| Score: binary | `actual === 1 ? 100 : 0` |
-
----
-
-## 🗺 Demo Flow for Judges
+## 🗺 Quick Demo Flow for Judges (How to Test)
 
 1. **Open app** → See Employee dashboard (Alice Sharma)
-2. Go to **My Goals** → Show 4 goals totaling 100% weightage
-3. Click **✨ sparkle** on a goal → See AI Goal Coach transform it
-4. **Submit to Manager** → Success confirmation
-5. **Switch to Bob Mehta** (Manager) via role switcher
-6. Go to **Approval Queue** → See Alice's sheet
-7. **Edit a weightage inline** → Approve & Lock
-8. **Switch back to Alice** → Goals show as 🔒 Locked
-9. Go to **Update Progress** → Enter Q1 actuals → See live scores
-10. **Switch to Bob** → Check-ins → Click **AI Draft** → Submit
-11. **Switch to Carol** (Admin) → HR Dashboard with charts
-12. Go to **Audit Log** → Show JSON diffs of every action
-13. Go to **Export** → Download CSV
+2. Go to **My Goals** → View 4 goals totaling 100% weightage. Try to change one to 110% to see the validation block you!
+3. Click **✨ sparkle** on a goal → See the AI Goal Coach transform it into a SMART goal.
+4. **Submit to Manager** → Success confirmation.
+5. **Switch to Bob Mehta** (Manager) via the top-right role switcher.
+6. Go to **Approval Queue** → See Alice's sheet. Edit a weightage inline → **Approve & Lock**.
+7. **Switch back to Alice** → Goals now show as 🔒 Locked.
+8. Go to **Update Progress** → Enter Q1 actuals → See live mathematical scores.
+9. **Switch to Bob** → Check-ins → Click **AI Draft** to auto-generate feedback → Submit.
+10. **Switch to Carol** (Admin) → View HR Dashboard Analytics, Audit Logs, and test the CSV Exports.
 
 ---
 
-## 🏆 Winning Differentiators
+## 🚀 Local Development (For Developers)
 
-1. **Closed business loop** — not just CRUD
-2. **AI that's actually useful** — SMART transformation, not chatbot glitter
-3. **Audit trail as a feature** — every diff stored and viewable
-4. **Demo-first design** — role switcher, seeded data, reliable fallbacks
-5. **Enterprise SaaS aesthetics** — dark mode, glassmorphism, animations
-
----
-
-## 📁 Project Structure
-
+```bash
+git clone https://github.com/your-username/GoalOps
+cd GoalOps
+npm install
+npm run dev
 ```
-src/
-  app/
-    dashboard/        ← Employee home
-    goals/            ← Goal builder + Q1 update
-    manager/          ← Team dashboard, approvals, check-ins
-    admin/            ← HR dashboard, cycles, audit, export
-    api/
-      ai/             ← Goal Coach + Check-in Assistant
-  components/
-    AppShell.tsx      ← Main layout
-    Sidebar.tsx       ← Role-aware navigation
-    RoleSwitcher.tsx  ← Demo role switcher
-    GoalCoach.tsx     ← AI Coach slide-in panel
-    StatusChip.tsx    ← Status indicators
-  lib/
-    types.ts          ← All TypeScript types
-    utils.ts          ← Business logic (score formulas)
-    role-context.tsx  ← Demo role state
-    supabase.ts       ← DB client
-supabase/
-  schema.sql          ← Full 14-table schema
-  seed.sql            ← Demo data
-```
+Open [http://localhost:3000](http://localhost:3000). The app will run purely in Demo Mode without requiring database keys.
 
 ---
-
-## 📄 License
-
-MIT — Built for Atomberg Hackathon 2026
+*Built with ❤️ for the Atomquest Hackathon 2026*
