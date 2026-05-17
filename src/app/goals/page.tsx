@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Target, Plus, Trash2, Sparkles, AlertCircle, CheckCircle2, Lock, Send, ChevronDown, ChevronUp } from 'lucide-react';
 import { GoalFormData, UomType, ScoreDirection } from '@/lib/types';
 import { validateGoalWeightage } from '@/lib/utils';
+import { useDemoGoals, PersistedGoal } from '@/lib/useDemoGoals';
 
 const THRUST_AREAS = [
   { id: 'thrust-growth-0-0000-000000000001', name: 'Revenue Growth', color: 'text-emerald-400' },
@@ -17,22 +18,28 @@ const THRUST_AREAS = [
   { id: 'thrust-cust-000-0000-000000000005', name: 'Customer Delight', color: 'text-amber-400' },
 ];
 
-const DEMO_GOALS_INIT = [
-  { id: '1', thrust_area_id: 'thrust-tech-000-0000-000000000004', title: 'Reduce API response time by 40%', description: 'Optimize backend services to achieve sub-200ms P95 response.', uom_type: 'percentage' as UomType, score_direction: 'lower_better' as ScoreDirection, target_value: '40', target_date: '2026-12-31', weightage: '30' },
-  { id: '2', thrust_area_id: 'thrust-ops-000-0000-000000000002', title: 'Achieve 95% unit test coverage', description: 'Increase coverage from 72% to 95% across all microservices.', uom_type: 'percentage' as UomType, score_direction: 'higher_better' as ScoreDirection, target_value: '95', target_date: '2026-09-30', weightage: '25' },
-  { id: '3', thrust_area_id: 'thrust-people-0-0000-000000000003', title: 'Complete 3 technical certifications', description: 'AWS, Kubernetes, and system design certifications.', uom_type: 'number' as UomType, score_direction: 'higher_better' as ScoreDirection, target_value: '3', target_date: '2026-12-31', weightage: '20' },
-  { id: '4', thrust_area_id: 'thrust-cust-000-0000-000000000005', title: 'Zero P0 bugs in production', description: 'Zero critical incidents attributable to the team.', uom_type: 'binary' as UomType, score_direction: 'binary' as ScoreDirection, target_value: '1', target_date: '2026-12-31', weightage: '25' },
-];
+
 
 interface GoalCard { id: string; data: GoalFormData; expanded: boolean; }
 
 export default function GoalsPage() {
-  const [goals, setGoals] = useState<GoalCard[]>(
-    DEMO_GOALS_INIT.map((g) => ({ id: g.id, data: { thrust_area_id: g.thrust_area_id, title: g.title, description: g.description, uom_type: g.uom_type, score_direction: g.score_direction, target_value: g.target_value, target_date: g.target_date, weightage: g.weightage }, expanded: false }))
-  );
+  const { goals: savedGoals, status: savedStatus, isLoaded, saveGoals } = useDemoGoals();
+  const [goals, setGoals] = useState<GoalCard[]>([]);
   const [coachGoalId, setCoachGoalId] = useState<string | null>(null);
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [status, setStatus] = useState(savedStatus);
   const [submitted, setSubmitted] = useState(false);
+
+  // Initialize from hook
+  useEffect(() => {
+    if (isLoaded) {
+      setGoals(savedGoals.map(g => ({ ...g, expanded: false })));
+      setStatus(savedStatus);
+      if (savedStatus === 'submitted' || savedStatus === 'locked') {
+        setSubmitted(true);
+      }
+    }
+  }, [isLoaded, savedGoals, savedStatus]);
 
   const weightages = goals.map((g) => Number(g.data.weightage) || 0);
   const validation = validateGoalWeightage(weightages);
@@ -59,6 +66,8 @@ export default function GoalsPage() {
     if (!canSubmit) return;
     setSubmitLoading(true);
     await new Promise((r) => setTimeout(r, 1500));
+    setStatus('submitted');
+    saveGoals(goals.map(g => ({ id: g.id, data: g.data })), 'submitted');
     setSubmitted(true);
     setSubmitLoading(false);
   };

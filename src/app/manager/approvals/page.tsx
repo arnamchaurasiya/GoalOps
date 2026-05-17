@@ -3,8 +3,17 @@
 import { AppShell } from '@/components/AppShell';
 import { StatusChip } from '@/components/StatusChip';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CheckCircle2, XCircle, MessageSquare, Edit2, Lock, Users, ClipboardList, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
+import { useDemoGoals } from '@/lib/useDemoGoals';
+
+const THRUST_AREAS = [
+  { id: 'thrust-growth-0-0000-000000000001', name: 'Revenue Growth', color: 'text-emerald-400' },
+  { id: 'thrust-ops-000-0000-000000000002', name: 'Operational Excellence', color: 'text-blue-400' },
+  { id: 'thrust-people-0-0000-000000000003', name: 'People Development', color: 'text-purple-400' },
+  { id: 'thrust-tech-000-0000-000000000004', name: 'Technology & Innovation', color: 'text-cyan-400' },
+  { id: 'thrust-cust-000-0000-000000000005', name: 'Customer Delight', color: 'text-amber-400' },
+];
 
 const DEMO_TEAM = [
   {
@@ -45,17 +54,48 @@ const DEMO_TEAM = [
 type ApprovalState = Record<string, { decision: 'approved' | 'returned' | null; comment: string; expanded: boolean; editMode: boolean; editedWeightages: Record<string, number> }>;
 
 export default function ManagerApprovalsPage() {
-  const [states, setStates] = useState<ApprovalState>(
-    Object.fromEntries(
-      DEMO_TEAM.filter((m) => m.sheetStatus === 'submitted').map((m) => [
-        m.id,
-        { decision: null, comment: '', expanded: true, editMode: false, editedWeightages: Object.fromEntries(m.goals.map((g) => [g.id, g.weightage])) },
-      ])
-    )
-  );
+  const { goals: aliceGoals, status: aliceStatus, isLoaded, saveGoals } = useDemoGoals();
+  const [states, setStates] = useState<ApprovalState>({});
   const [lockedSheets, setLockedSheets] = useState<string[]>([]);
+  const [team, setTeam] = useState(DEMO_TEAM);
 
-  const pending = DEMO_TEAM.filter((m) => m.sheetStatus === 'submitted' && !lockedSheets.includes(m.id));
+  useEffect(() => {
+    if (isLoaded) {
+      const updatedTeam = DEMO_TEAM.map(m => {
+        if (m.id === 'user-alice-000-0000-000000000001') {
+          return {
+            ...m,
+            sheetStatus: (aliceStatus === 'submitted' || aliceStatus === 'locked') ? 'submitted' : 'draft',
+            goals: aliceGoals.map(g => ({
+              id: g.id,
+              title: g.data.title,
+              weightage: Number(g.data.weightage) || 0,
+              thrust: THRUST_AREAS.find(t => t.id === g.data.thrust_area_id)?.name || 'Misc',
+              target: g.data.target_value,
+              uom: g.data.uom_type === 'percentage' ? '%' : g.data.uom_type === 'number' ? '#' : g.data.uom_type
+            }))
+          };
+        }
+        return m;
+      });
+      setTeam(updatedTeam as any);
+
+      // Initialize states for submitted sheets
+      const initialStates = Object.fromEntries(
+        updatedTeam.filter((m) => m.sheetStatus === 'submitted').map((m) => [
+          m.id,
+          { decision: null, comment: '', expanded: true, editMode: false, editedWeightages: Object.fromEntries(m.goals.map((g) => [g.id, g.weightage])) },
+        ])
+      );
+      setStates(initialStates);
+
+      if (aliceStatus === 'locked') {
+        setLockedSheets(prev => [...prev, 'user-alice-000-0000-000000000001']);
+      }
+    }
+  }, [isLoaded, aliceGoals, aliceStatus]);
+
+  const pending = team.filter((m) => m.sheetStatus === 'submitted' && !lockedSheets.includes(m.id));
   const approved = lockedSheets.length;
 
   const setState = (id: string, updates: Partial<ApprovalState[string]>) => {
@@ -65,6 +105,14 @@ export default function ManagerApprovalsPage() {
   const handleDecision = (memberId: string, decision: 'approved' | 'returned') => {
     setState(memberId, { decision });
     if (decision === 'approved') {
+      if (memberId === 'user-alice-000-0000-000000000001') {
+        // save the edited weightages back to Alice's storage!
+        const updatedAliceGoals = aliceGoals.map(g => ({
+          ...g,
+          data: { ...g.data, weightage: states[memberId].editedWeightages[g.id].toString() }
+        }));
+        saveGoals(updatedAliceGoals, 'locked');
+      }
       setTimeout(() => setLockedSheets((prev) => [...prev, memberId]), 800);
     }
   };
@@ -82,7 +130,7 @@ export default function ManagerApprovalsPage() {
           {[
             { label: 'Pending Review', value: pending.length, icon: <ClipboardList size={18} />, color: 'text-amber-400', bg: 'bg-amber-900/20' },
             { label: 'Approved & Locked', value: approved, icon: <Lock size={18} />, color: 'text-emerald-400', bg: 'bg-emerald-900/20' },
-            { label: 'Not Submitted', value: DEMO_TEAM.filter((m) => m.sheetStatus === 'draft').length, icon: <AlertTriangle size={18} />, color: 'text-slate-400', bg: 'bg-slate-800/60' },
+            { label: 'Not Submitted', value: team.filter((m) => m.sheetStatus === 'draft').length, icon: <AlertTriangle size={18} />, color: 'text-slate-400', bg: 'bg-slate-800/60' },
           ].map((s) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-xl p-4">
               <div className={`w-8 h-8 rounded-lg ${s.bg} flex items-center justify-center ${s.color} mb-2`}>{s.icon}</div>
@@ -233,7 +281,7 @@ export default function ManagerApprovalsPage() {
         {lockedSheets.length > 0 && (
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2"><Lock size={14} className="text-purple-400" />Approved & Locked</h2>
-            {DEMO_TEAM.filter((m) => lockedSheets.includes(m.id)).map((member) => (
+            {team.filter((m) => lockedSheets.includes(m.id)).map((member) => (
               <motion.div key={member.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card rounded-xl px-5 py-4 flex items-center gap-4 border border-purple-700/20">
                 <div className="w-8 h-8 rounded-lg bg-purple-900/30 flex items-center justify-center"><Lock size={14} className="text-purple-400" /></div>
                 <div className="flex-1">
@@ -249,7 +297,7 @@ export default function ManagerApprovalsPage() {
         {/* Not submitted */}
         <div className="space-y-3">
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2"><AlertTriangle size={14} className="text-slate-500" />Not Yet Submitted</h2>
-          {DEMO_TEAM.filter((m) => m.sheetStatus === 'draft').map((member) => (
+          {team.filter((m) => m.sheetStatus === 'draft').map((member) => (
             <div key={member.id} className="glass-card rounded-xl px-5 py-4 flex items-center gap-4 opacity-60">
               <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-400">{member.name.split(' ').map((n) => n[0]).join('')}</div>
               <div className="flex-1">

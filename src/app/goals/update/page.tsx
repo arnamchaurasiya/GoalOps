@@ -5,18 +5,36 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { TrendingUp, CheckCircle2, Lock, AlertCircle } from 'lucide-react';
 import { StatusChip } from '@/components/StatusChip';
-
-const GOALS = [
-  { id: '1', title: 'Reduce API response time by 40%', weightage: 30, target: 40, uom: '%', direction: 'lower_better', locked: true },
-  { id: '2', title: 'Achieve 95% unit test coverage', weightage: 25, target: 95, uom: '%', direction: 'higher_better', locked: true },
-  { id: '3', title: 'Complete 3 technical certifications', weightage: 20, target: 3, uom: '#', direction: 'higher_better', locked: true },
-  { id: '4', title: 'Zero P0 bugs in production', weightage: 25, target: 1, uom: 'binary', direction: 'binary', locked: true },
-];
+import { useDemoGoals } from '@/lib/useDemoGoals';
 
 export default function GoalUpdatePage() {
-  const [actuals, setActuals] = useState<Record<string, string>>({ '1': '28', '2': '81', '3': '1', '4': '1' });
+  const { goals: savedGoals, status, isLoaded, saveGoals } = useDemoGoals();
+  const [actuals, setActuals] = useState<Record<string, string>>({});
   const [comments, setComments] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+
+  // Load actuals if they exist
+  useEffect(() => {
+    if (isLoaded) {
+      const loadedActuals: Record<string, string> = {};
+      savedGoals.forEach(g => {
+        if (g.actual_value) loadedActuals[g.id] = g.actual_value;
+      });
+      if (Object.keys(loadedActuals).length > 0) {
+        setActuals(loadedActuals);
+      }
+    }
+  }, [isLoaded, savedGoals]);
+
+  const GOALS = savedGoals.map(g => ({
+    id: g.id,
+    title: g.data.title,
+    weightage: Number(g.data.weightage) || 0,
+    target: Number(g.data.target_value) || 0,
+    uom: g.data.uom_type === 'percentage' ? '%' : g.data.uom_type === 'number' ? '#' : g.data.uom_type,
+    direction: g.data.score_direction,
+    locked: status === 'locked'
+  }));
 
   const computeScore = (goal: typeof GOALS[0]) => {
     const actual = Number(actuals[goal.id] || 0);
@@ -100,7 +118,16 @@ export default function GoalUpdatePage() {
                 <p className="text-sm font-semibold text-slate-200">Overall Weighted Score: <span className={`text-lg font-bold ${totalScore >= 80 ? 'text-emerald-400' : 'text-amber-400'}`}>{Math.round(totalScore)}%</span></p>
                 <p className="text-xs text-slate-500 mt-0.5">Weighted average across all goal scores</p>
               </div>
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={() => setSubmitted(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-semibold shadow-lg shadow-blue-500/20">
+              <motion.button 
+                whileHover={{ scale: 1.02 }} 
+                whileTap={{ scale: 0.98 }} 
+                onClick={() => {
+                  const updatedGoals = savedGoals.map(g => ({ ...g, actual_value: actuals[g.id] || '' }));
+                  saveGoals(updatedGoals, status);
+                  setSubmitted(true);
+                }} 
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-semibold shadow-lg shadow-blue-500/20"
+              >
                 <TrendingUp size={15} /> Submit Q1 Update
               </motion.button>
             </div>

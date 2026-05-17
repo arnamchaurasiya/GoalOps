@@ -5,18 +5,23 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Sparkles, MessageSquare, Send, CheckCircle2, Loader2 } from 'lucide-react';
 
-const ALICE_GOALS = [
-  { id: '1', title: 'Reduce API response time by 40%', target: 40, actual: 28, weightage: 30, uom: '%' },
-  { id: '2', title: 'Achieve 95% unit test coverage', target: 95, actual: 81, weightage: 25, uom: '%' },
-  { id: '3', title: 'Complete 3 technical certifications', target: 3, actual: 1, weightage: 20, uom: '#' },
-  { id: '4', title: 'Zero P0 bugs in production', target: 1, actual: 1, weightage: 25, uom: 'binary' },
-];
+import { useDemoGoals } from '@/lib/useDemoGoals';
 
 export default function ManagerCheckinsPage() {
+  const { goals: savedGoals } = useDemoGoals();
   const [comment, setComment] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [aiDraft, setAiDraft] = useState<string | null>(null);
+
+  const ALICE_GOALS = savedGoals.map(g => ({
+    id: g.id,
+    title: g.data.title,
+    weightage: Number(g.data.weightage) || 0,
+    target: Number(g.data.target_value) || 0,
+    actual: Number(g.actual_value) || 0,
+    uom: g.data.uom_type === 'percentage' ? '%' : g.data.uom_type === 'number' ? '#' : g.data.uom_type
+  }));
 
   const generateAiDraft = async () => {
     setAiLoading(true);
