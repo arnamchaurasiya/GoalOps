@@ -13,10 +13,9 @@ GoalOps replaces scattered spreadsheets and appraisal chaos with a secure, audit
 
 ### ✅ Submission Deliverables Fulfilled
 1. **Live Demo URL:** [👉 View Live Application Here 👈](https://goal-ops-brown.vercel.app/dashboard)
-2. **Working Video:** [👉 Watch the Video Demo Here 👈](#replace-with-youtube-link)
-3. **Source Code:** [GitHub Repository](https://github.com/arnamchaurasiya/GoalOps)
-4. **Architecture Diagram:** See the architecture diagram below.
-5. **Login Credentials:** Bypassed for convenience. Use the **"Demo Role Switcher"** in the top right corner to instantly switch between Employee, Manager, and HR roles.
+2. **Source Code:** [GitHub Repository](https://github.com/arnamchaurasiya/GoalOps)
+3. **Architecture Diagram:** See the architecture diagram below.
+4. **Login Credentials:** Bypassed for convenience. Use the **"Demo Role Switcher"** in the top right corner to instantly switch between Employee, Manager, and HR roles.
 
 ---
 
@@ -82,7 +81,7 @@ We strategically focused on high-impact visual bonus features:
 ## 🚀 Local Development (For Developers)
 
 ```bash
-git clone https://github.com/your-username/GoalOps
+git clone https://github.com/arnamchaurasiya/GoalOps
 cd GoalOps
 npm install
 npm run dev
