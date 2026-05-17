@@ -82,7 +82,7 @@ We strategically focused on high-impact visual bonus features:
 ## 🚀 Local Development (For Developers)
 
 ```bash
-git clone https://github.com/your-username/GoalOps
+git clone https://github.com/arnamchaurasiya/GoalOps
 cd GoalOps
 npm install
 npm run dev
