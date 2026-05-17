@@ -3,7 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useRole } from '@/lib/role-context';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { NotificationsPanel } from './NotificationsPanel';
 import {
   LayoutDashboard,
   Target,
@@ -48,6 +50,8 @@ const NAV_ITEMS: NavItem[] = [
 export function Sidebar() {
   const pathname = usePathname();
   const { activeRole } = useRole();
+
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
 
   const filteredItems = NAV_ITEMS.filter((item) => item.roles.includes(activeRole));
 
@@ -107,10 +111,12 @@ export function Sidebar() {
 
       {/* Bottom: notifications + lock hint */}
       <div className="p-3 border-t border-slate-800 space-y-1">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all duration-150">
+        <button onClick={() => setIsNotifOpen(true)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all duration-150">
           <Bell size={18} className="opacity-60" />
           <span className="text-sm font-medium">Notifications</span>
-          <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold ml-auto">2</span>
+          <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold ml-auto">
+            {activeRole === 'employee' ? '2' : activeRole === 'manager' ? '2' : '2'}
+          </span>
         </button>
         {activeRole !== 'admin' && (
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800/40 text-slate-500 text-xs">
@@ -119,6 +125,10 @@ export function Sidebar() {
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {isNotifOpen && <NotificationsPanel onClose={() => setIsNotifOpen(false)} />}
+      </AnimatePresence>
     </aside>
   );
 }
