@@ -4,7 +4,6 @@
 
 GoalOps replaces scattered spreadsheets and appraisal chaos with a secure, audit-ready goal operating system for employees, managers, and HR.
 
-[![Deploy on Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 ---
 
@@ -13,9 +12,9 @@ GoalOps replaces scattered spreadsheets and appraisal chaos with a secure, audit
 **Welcome Judges!** To ensure a flawless evaluation experience, we have deployed the portal in an **"Ultra-Reliable Demo Mode"**. All data (users, goals, charts, logs) is securely pre-seeded in memory. **You do NOT need to configure a database or API keys to test this application.**
 
 ### ✅ Submission Deliverables Fulfilled
-1. **Live Demo URL:** [👉 View Live Application Here 👈](#replace-with-vercel-link)
+1. **Live Demo URL:** [👉 View Live Application Here 👈](https://goal-ops-brown.vercel.app/dashboard)
 2. **Working Video:** [👉 Watch the Video Demo Here 👈](#replace-with-youtube-link)
-3. **Source Code:** [GitHub Repository](#replace-with-github-link)
+3. **Source Code:** [GitHub Repository](https://github.com/arnamchaurasiya/GoalOps)
 4. **Architecture Diagram:** See the architecture diagram below.
 5. **Login Credentials:** Bypassed for convenience. Use the **"Demo Role Switcher"** in the top right corner to instantly switch between Employee, Manager, and HR roles.
 
